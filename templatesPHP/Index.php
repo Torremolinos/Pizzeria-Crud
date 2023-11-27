@@ -1,4 +1,5 @@
-<?php
+<?php 
+/*github: https://github.com/Torremolinos/Pizzeria-Crud*/ 
 function conectarBD()
 {
     //Funcion que nos conecta a la base de datos, tenemos que mandarle la direccion ip del host, el usuario, la clave y el nombre de la BD
