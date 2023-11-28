@@ -1,5 +1,5 @@
-<?php 
-/*github: https://github.com/Torremolinos/Pizzeria-Crud*/ 
+<?php
+/*github: https://github.com/Torremolinos/Pizzeria-Crud*/
 function conectarBD()
 {
     //Funcion que nos conecta a la base de datos, tenemos que mandarle la direccion ip del host, el usuario, la clave y el nombre de la BD
@@ -15,9 +15,6 @@ function conectarBD()
     }
 }
 
-
-
-
 function comprobar_usuario($usuario, $contrasenia)
 {
     //Nos conectamos a la BD y lo igualamos a conn que sera donde se guarde la conexion
@@ -29,14 +26,12 @@ function comprobar_usuario($usuario, $contrasenia)
     //lanzar la consulta
     $consulta->execute();
 
-
     if ($consulta->rowCount() > 0) {
         $row = $consulta->fetch(PDO::FETCH_ASSOC);
         return array("usuario" => $row['usuario'], "nombre" => $row['nombre'], "rol" => $row['rol']);
     } else
         return FALSE;
 }
-
 if ($_SERVER['REQUEST_METHOD'] == "POST") {
     $usu = comprobar_usuario($_POST["usuario"], $_POST["contrasenia"]);
     if ($usu == FALSE) {
@@ -53,7 +48,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         }
     }
 }
-
 $conn = conectarBD();
 function listarPizzas($conn)
 {
@@ -68,152 +62,15 @@ function listarPizzas($conn)
     echo "</tbody>";
     echo "</table>";
 }
-
 ?>
-
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles/index.css">
+    <link rel="stylesheet" href="../styles/index.css">
     <title>Index</title>
-    <style>
-        * {
-            margin: 0%;
-            padding: 0%;
-            box-sizing: border-box;
-        }
-
-        body {
-            color: wheat;
-            font-family: Arial, Helvetica, sans-serif;
-            background-color: #f4f4f4;
-            text-align: center;
-            padding: 50px;
-            background: url('../assets/img/menupiz.jpg');
-            /* Reemplaza 'ruta/a/tu/imagen.jpg' con la ruta correcta de tu imagen */
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-attachment: fixed;
-            background-size: cover;
-
-        }
-
-        .formulario {
-            display: flex;
-            text-align: center;
-            padding: 4px;
-            margin: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-        }
-
-        .tabla {
-            display: flex;
-            justify-content: center;
-        }
-
-        h1 {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        h2 {
-            padding: 4px;
-            margin: 4px;
-        }
-
-        table {
-            border-collapse: collapse;
-            text-align: center;
-            background: burlywood;
-            border: none;
-            margin: 4px;
-        }
-
-        th,
-        td {
-            color: black;
-            padding: 4px;
-        }
-
-        td:hover {
-            transform: scale(1.5);
-            transition: transform 0.3s ease;
-            background-color: whitesmoke;
-        }
-
-        th:hover {
-            transform: scale(1.5);
-            transition: transform 0.3s ease;
-            background-color: whitesmoke;
-        }
-
-        /* td:nth-child(3) {
-            text-align: justify;
-        } */
-        .esconde {
-            display: none;
-        }
-
-        a {
-            display: flex;
-            align-content: center;
-            justify-content: center;
-            padding: 10px;
-            color:beige;
-        }
-
-        .escondido {
-            display: inline-block;
-            width: 7%;
-            text-align: center;
-            text-decoration: none;
-            font-size: 16px;
-            cursor: pointer;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #f0f0f0;
-            color: #333;
-            transition: background-color 0.3s ease;
-            margin: 4px;
-            padding: 4px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .buttones {
-            text-align: center;
-            display: flex;
-            align-items: center;
-            align-content: center;
-            flex-wrap: nowrap;
-            flex-direction: row;
-            justify-content: center;
-        }
-
-        p {
-            text-align: center;
-            padding: 4px;
-            margin: 4px;
-        }
-
-        .mostrar {
-            display: flex;
-            display: none;
-            text-align: center;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
 </head>
 
 <body>
@@ -265,8 +122,6 @@ function listarPizzas($conn)
                 </tbody>
             </table>
         </div>
-
-
     </section>
     <?php if (isset($_SESSION['usuario'])) : ?>
         <div class=buttones><a class="<?php echo isset($_SESSION['usuario']) ? '' : 'escondido'; ?>" href='pedido.php'>Realizar Pedido</a></div>
