@@ -8,7 +8,7 @@ function conectarBD()
     $contrasenia = "";
     try {
         //Se crea el objeto de conexion a la base de datos y se devueve
-        $bd = new PDO($cadena_conexion, $usuario, $contrasenia);
+        $bd = new PDO($cadena_conexion, $usuario, $contrasenia); 
         return $bd;
     } catch (PDOException $e) {
         echo "Error conectar BD: " . $e->getMessage();
@@ -77,6 +77,7 @@ function listarPizzas($conn)
     <?php if (!isset($_SESSION['usuario'])) : ?>
         <section class="<?php echo !isset($_SESSION['usuario']) ? '' : 'esconde'; ?>">
             <h2>Identificate</h2>
+            <a href="nuevo_usuario.php">¿No tienes cuenta? registrate aquí</a>
             <div class="formulario">
                 <form action=<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?> method="POST">
                     <label for="usuario">Usuario</label>
@@ -85,6 +86,7 @@ function listarPizzas($conn)
                     <input type="password" name="contrasenia"> <!-- Este tipo nos permite que salgan puntitos para que no se vea -->
                     <button action="submit">Enviar</button>
                 </form>
+               
             </div>
         </section>
     <?php endif; ?>

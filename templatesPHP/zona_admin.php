@@ -91,6 +91,7 @@ function listarPizzas($conn)
 
 <body>
     <h1>Bienvenido, <?php echo $_SESSION['nombre'] ?></h1>
+    <a href="Index.php">Volver a la página principal</a>
     <div class="formulario">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
             Nombre: <input type="text" name="nombre"><br>
