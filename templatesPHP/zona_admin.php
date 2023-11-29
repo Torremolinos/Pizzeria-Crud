@@ -3,6 +3,7 @@ session_start();
 if (!isset($_SESSION["usuario"])) {
     header("Location: Index.php?redirigido=true");
 }
+
 function conectarBD()
 {
     $cadena_conexion = 'mysql:dbname=dwes_t3;host=127.0.0.1';
@@ -17,17 +18,17 @@ function conectarBD()
     }
 }
 
-// Función para conectar a la BD y otras funciones
 // Conectar a la base de datos
 $conn = conectarBD();
 
 // Revisa si el formulario ha sido enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recoger los datos del formulario
-    $nombrePizza = $_POST['nombre'];
-    $costePizza = $_POST['coste'];
-    $precioPizza = $_POST['precio'];
-    $ingredientesPizza = $_POST['ingredientes'];
+    $nombrePizza = isset($_POST['nombre']) ? $_POST['nombre'] : '';
+    $costePizza = isset($_POST['coste']) ? $_POST['coste'] : '';
+    $precioPizza = isset($_POST['precio']) ? $_POST['precio'] : '';
+
+    $ingredientesPizza = isset($_POST['ingredientes']) ? $_POST['ingredientes'] : '';
 
     // Preparar la consulta SQL
     // Verificar que los datos no estén vacíos antes de insertar
@@ -42,29 +43,43 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $insertar->bindParam(':ingredientes', $ingredientesPizza);
 
         $insertar->execute();
-    } elseif ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['borrar'])) {
+    } elseif (isset($_POST['borrar'])) {
         $pizza_id = $_POST['pizza_id'];
 
         // Preparar la consulta SQL para borrar la pizza
         $borrar = $conn->prepare("DELETE FROM pizzas WHERE id = :pizza_id");
         $borrar->bindParam(':pizza_id', $pizza_id);
         $borrar->execute();
-    }
-};
+    } elseif (isset($_POST['editar'])) {
+        $pizza_id = $_POST['pizza_id'];
+        $nombrePizza = isset($_POST['nombre']) ? $_POST['nombre'] : '';
+        $costePizza = isset($_POST['coste']) ? $_POST['coste'] : '';
+        $precioPizza = isset($_POST['precio']) ? $_POST['precio'] : '';
+        $ingredientesPizza = isset($_POST['ingredientes']) ? $_POST['ingredientes'] : '';
 
+        // Preparar la consulta SQL para editar la pizza
+        $editar = $conn->prepare("UPDATE pizzas SET nombre = :nombre, coste = :coste, precio = :precio, ingredientes = :ingredientes WHERE id = :pizza_id");
+        $editar->bindParam(':nombre', $nombrePizza);
+        $editar->bindParam(':coste', $costePizza);
+        $editar->bindParam(':precio', $precioPizza);
+        $editar->bindParam(':ingredientes', $ingredientesPizza);
+        $editar->bindParam(':pizza_id', $pizza_id);
+        $editar->execute();
+    }
+}
 
 // Función para listar pizzas
 function listarPizzas($conn)
 {
-    $consulta = $conn->prepare("SELECT id, nombre, ingredientes,coste , precio FROM pizzas");
+    $consulta = $conn->prepare("SELECT id, nombre, ingredientes, coste, precio FROM pizzas");
     $consulta->execute();
     echo "<table border='2'>";
-    echo "<tr><th>Pizza</th><th>Ingredientes</th><th>Precio</th><th>Acciones Admin</th></tr>";
+    echo "<tr><th>Pizza</th><th>Ingredientes</th><th>Coste</th><th>Precio</th><th>Acciones Admin</th></tr>";
     foreach ($consulta->fetchAll(PDO::FETCH_ASSOC) as $row) {
         echo "<tr>";
         echo "<td>$row[nombre]</td><td>$row[ingredientes]</td><td>$row[coste]</td><td> $row[precio]€</td>";
         echo "<td>
-                <form action='editar_pizza.php' method='post'>
+                <form action='' method='post'>
                     <input type='hidden' name='pizza_id' value='$row[id]'>
                     <input type='submit' name='editar' value='Editar'>
                 </form>
@@ -87,6 +102,35 @@ function listarPizzas($conn)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zona Admin</title>
     <link rel="stylesheet" href="../styles/index.css">
+    <style>
+        .formulario {
+            margin-bottom: 20px;
+        }
+
+        .formulario input[type="text"],
+        .formulario input[type="number"],
+        .formulario textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .formulario input[type="submit"] {
+            background-color:burlywood;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .formulario input[type="submit"]:hover {
+            background-color: coral;
+        }
+    </style>
 </head>
 
 <body>

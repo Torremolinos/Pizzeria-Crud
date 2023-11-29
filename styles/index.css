@@ -52,24 +52,25 @@
             background: burlywood;
             border: none;
             margin: 4px;
+            font-family: Arial, sans-serif;
         }
 
         th,
         td {
             color: black;
-            padding: 4px;
+            padding: 10px;
         }
 
         td:hover {
-            transform: scale(1.5);
+            transform: scale(1.1);
             transition: transform 0.3s ease;
-            background-color: whitesmoke;
+            background-color: #f0f0f0;
         }
 
         th:hover {
-            transform: scale(1.5);
+            transform: scale(1.1);
             transition: transform 0.3s ease;
-            background-color: whitesmoke;
+            background-color: #f0f0f0;
         }
 
         /* td:nth-child(3) {
@@ -130,4 +131,38 @@
             align-items: center;
             justify-content: center;
         }
-        
+        .formulario {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .formulario label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .formulario input[type="text"],
+        .formulario input[type="password"],
+        .formulario input[type="email"] {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        .formulario button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .formulario button[type="submit"]:hover {
+            background-color: #45a049;
+        }

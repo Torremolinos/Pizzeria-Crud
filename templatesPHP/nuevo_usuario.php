@@ -14,6 +14,16 @@ function conectarBD()
     }
 }
 
+function usuarioExiste($usuario)
+{
+    $conexion = conectarBD();
+    $consulta = $conexion->prepare("SELECT COUNT(*) FROM usuarios WHERE usuario = :usuario");
+    $consulta->bindParam(':usuario', $usuario);
+    $consulta->execute();
+    $resultado = $consulta->fetchColumn();
+    return $resultado > 0;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recoger los datos del formulario
     $nombre = $_POST['nombre'];
@@ -22,22 +32,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $rol = $_POST['rol'];
     $usuario = $_POST['usuario'];
 
-    // Preparar la consulta SQL
     // Verificar que los datos no estén vacíos antes de insertar
     if (!empty($nombre) && !empty($correo) && !empty($contrasenia) && !empty($rol) && !empty($usuario)) {
-        // Preparar la consulta SQL
-        $conexion = conectarBD(); // Usamos la función para conectar a la base de datos
-        $insertar = $conexion->prepare("INSERT INTO usuarios (nombre, correo, contrasenia, rol, usuario) VALUES (:nombre, :correo, :contrasenia, :rol, :usuario)");
+        // Verificar si el usuario ya existe
+        if (usuarioExiste($usuario)) {
+            echo "El nombre de usuario ya existe. Por favor, elige otro.";
+        } else {
+            // Preparar la consulta SQL
+            $conexion = conectarBD(); // Usamos la función para conectar a la base de datos
+            $insertar = $conexion->prepare("INSERT INTO usuarios (nombre, correo, contrasenia, rol, usuario) VALUES (:nombre, :correo, :contrasenia, :rol, :usuario)");
 
-        // Vincular los parámetros
-        $insertar->bindParam(':nombre', $nombre);
-        $insertar->bindParam(':correo', $correo);
-        $insertar->bindParam(':contrasenia', $contrasenia);
-        $insertar->bindParam(':rol', $rol);
-        $insertar->bindParam(':usuario', $usuario);
+            // Vincular los parámetros
+            $insertar->bindParam(':nombre', $nombre);
+            $insertar->bindParam(':correo', $correo);
+            $insertar->bindParam(':contrasenia', $contrasenia);
+            $insertar->bindParam(':rol', $rol);
+            $insertar->bindParam(':usuario', $usuario);
 
-        $insertar->execute();
-        echo "Usuario Registrado Correctamente.";
+            $insertar->execute();
+            echo "Usuario Registrado Correctamente.";
+        }
     } else {
         echo "Por favor, completa todos los campos.";
     }
@@ -58,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h1>REGISTRO</h1>
     <h2>Hola, completa todos los campos para poder registrarte</h2>
     <div class="formulario">
-        <form action=<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?> method="POST">
+        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
             <label for="usuario">Usuario</label>
             <input value="<?php if (isset($usuario)) echo $usuario; ?>" name="usuario">
             <br />
@@ -66,15 +80,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="password" name="contrasenia">
             <br />
             <label for="nombre">Nombre</label>
-            <input type="nombre" name="nombre">
+            <input type="text" name="nombre">
             <br />
             <label for="rol">Rol</label>
             <input type="text" name="rol">
             <br />
             <label for="correo">Correo</label>
-            <input type="mail" name="correo">
+            <input type="email" name="correo">
             <br />
-            <button action="submit">Enviar</button>
+            <button type="submit">Enviar</button>
         </form>
     </div>
     <a href="Index.php">Volver a la página principal</a>

@@ -128,7 +128,7 @@ function listarPizzas($conn)
     <?php if (isset($_SESSION['usuario'])) : ?>
         <div class=buttones><a class="<?php echo isset($_SESSION['usuario']) ? '' : 'escondido'; ?>" href='pedido.php'>Realizar Pedido</a></div>
     <?php endif; ?>
-    <audio src="../assets/audios/musica.mp3" controls></audio>
+    <audio id="background-music" src="../assets/audios/musica.mp3" controls loop hidden autoplay></audio>
 </body>
 
 </html>
