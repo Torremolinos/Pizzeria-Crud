@@ -8,5 +8,6 @@
 </head>
 <body>
     <h1>¡Muchas Gracias Por tu Compra!</h1>
+    <a href="Index.php">Volver Al Inicio</a>
 </body>
 </html>

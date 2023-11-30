@@ -71,6 +71,23 @@ function listarPizzas($conn)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/index.css">
     <title>Index</title>
+    <style>
+         button{
+            padding: 10px 20px;
+            background-color:burlywood;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: bisque;
+        }
+        label{
+            margin: 5px;
+        }
+    </style>
 </head>
 
 <body>
@@ -84,7 +101,7 @@ function listarPizzas($conn)
                     <input value="<?php if (isset($usuario)) echo $usuario; ?>" name="usuario">
                     <label for="contrasenia">Contraseña</label>
                     <input type="password" name="contrasenia"> <!-- Este tipo nos permite que salgan puntitos para que no se vea -->
-                    <button action="submit">Enviar</button>
+                    <button action="submit">Iniciar Sesión</button>
                 </form>
                
             </div>

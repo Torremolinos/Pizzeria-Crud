@@ -66,6 +66,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro</title>
     <link rel="stylesheet" href="../styles/index.css">
+    <style>
+        button{
+            padding: 10px 20px;
+            background-color: burlywood;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: bisque;
+        }
+    </style>
 </head>
 
 <body>

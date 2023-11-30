@@ -2,6 +2,7 @@
 session_start();
 if (!isset($_SESSION["usuario"])) {
     header("Location: Index.php?redirigido=true");
+    exit;
 }
 
 function conectarBD()
@@ -15,8 +16,11 @@ function conectarBD()
         return $bd;
     } catch (PDOException $e) {
         echo "Error conectando a la bd: " . $e->getMessage();
+        exit;
     }
 }
+
+
 
 // Conectar a la base de datos
 $conn = conectarBD();
@@ -24,13 +28,11 @@ $conn = conectarBD();
 // Revisa si el formulario ha sido enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Recoger los datos del formulario
-    $nombrePizza = isset($_POST['nombre']) ? $_POST['nombre'] : '';
-    $costePizza = isset($_POST['coste']) ? $_POST['coste'] : '';
-    $precioPizza = isset($_POST['precio']) ? $_POST['precio'] : '';
+    $nombrePizza = $_POST['nombre'] ?? '';
+    $costePizza = $_POST['coste'] ?? '';
+    $precioPizza = $_POST['precio'] ?? '';
+    $ingredientesPizza = $_POST['ingredientes'] ?? '';
 
-    $ingredientesPizza = isset($_POST['ingredientes']) ? $_POST['ingredientes'] : '';
-
-    // Preparar la consulta SQL
     // Verificar que los datos no estén vacíos antes de insertar
     if (!empty($nombrePizza) && !empty($costePizza) && !empty($precioPizza) && !empty($ingredientesPizza)) {
         // Preparar la consulta SQL
@@ -44,28 +46,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $insertar->execute();
     } elseif (isset($_POST['borrar'])) {
-        $pizza_id = $_POST['pizza_id'];
+        $pizza_id = $_POST['pizza_id'] ?? '';
 
         // Preparar la consulta SQL para borrar la pizza
         $borrar = $conn->prepare("DELETE FROM pizzas WHERE id = :pizza_id");
         $borrar->bindParam(':pizza_id', $pizza_id);
         $borrar->execute();
     } elseif (isset($_POST['editar'])) {
-        $pizza_id = $_POST['pizza_id'];
-        $nombrePizza = isset($_POST['nombre']) ? $_POST['nombre'] : '';
-        $costePizza = isset($_POST['coste']) ? $_POST['coste'] : '';
-        $precioPizza = isset($_POST['precio']) ? $_POST['precio'] : '';
-        $ingredientesPizza = isset($_POST['ingredientes']) ? $_POST['ingredientes'] : '';
+        $pizza_id = $_POST['pizza_id'] ?? '';
+        $nombrePizza = $_POST['nombre'] ?? '';
+        $costePizza = $_POST['coste'] ?? '';
+        $precioPizza = $_POST['precio'] ?? '';
+        $ingredientesPizza = $_POST['ingredientes'] ?? '';
 
-        // Preparar la consulta SQL para editar la pizza
-        $editar = $conn->prepare("UPDATE pizzas SET nombre = :nombre, coste = :coste, precio = :precio, ingredientes = :ingredientes WHERE id = :pizza_id");
-        $editar->bindParam(':nombre', $nombrePizza);
-        $editar->bindParam(':coste', $costePizza);
-        $editar->bindParam(':precio', $precioPizza);
-        $editar->bindParam(':ingredientes', $ingredientesPizza);
-        $editar->bindParam(':pizza_id', $pizza_id);
-        $editar->execute();
+        if (isset($_POST['actualizar'])) {
+            $nombre = $_POST['nombre'] ?? '';
+            $coste = $_POST['coste'] ?? '';
+            $precio = $_POST['precio'] ?? '';
+            $ingredientes = $_POST['ingredientes'] ?? '';
+            $pizza_id = $_POST['id'] ?? '';
+
+            // Preparar la consulta SQL para editar la pizza
+            $editar = $conn->prepare("UPDATE pizzas SET nombre = :nombre, coste = :coste, precio = :precio, ingredientes = :ingredientes WHERE id = :pizza_id");
+            $editar->bindParam(':nombre', $nombre);
+            $editar->bindParam(':coste', $coste);
+            $editar->bindParam(':precio', $precio);
+            $editar->bindParam(':ingredientes', $ingredientes);
+            $editar->bindParam(':pizza_id', $pizza_id);
+            $editar->execute();
+        }
     }
+}
+function editPizza($conn, $id){
+    // Preparar y ejecutar la consulta para obtener los detalles de la pizza por su ID
+  $query = $conn->prepare("SELECT * FROM pizzas WHERE id = :id");
+  $query->bindParam(":id", $id);
+  $query->execute();
+  // Devuelve los detalles de la pizza como un array asociativo
+  return $query->fetch(PDO::FETCH_ASSOC);
+}
+
+function masVendidas($conn)
+{
+
+    $masvendi = $conn->prepare("SELECT nombre, COUNT(*) as count FROM pedidos GROUP BY nombre ORDER BY count DESC LIMIT 1");    $masvendi->execute();
+    echo "<table border='2'>";
+    echo "<tr><th>Pizza Más Vendida</th></tr>";
+    foreach ($masvendi->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        echo "<tr>";
+        echo "<td>{$row['nombre']}</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
 }
 
 // Función para listar pizzas
@@ -77,14 +109,14 @@ function listarPizzas($conn)
     echo "<tr><th>Pizza</th><th>Ingredientes</th><th>Coste</th><th>Precio</th><th>Acciones Admin</th></tr>";
     foreach ($consulta->fetchAll(PDO::FETCH_ASSOC) as $row) {
         echo "<tr>";
-        echo "<td>$row[nombre]</td><td>$row[ingredientes]</td><td>$row[coste]</td><td> $row[precio]€</td>";
+        echo "<td>{$row['nombre']}</td><td>{$row['ingredientes']}</td><td>{$row['coste']}</td><td>{$row['precio']}€</td>";
         echo "<td>
                 <form action='' method='post'>
-                    <input type='hidden' name='pizza_id' value='$row[id]'>
+                    <input type='hidden' name='pizza_id' value='{$row['id']}'>
                     <input type='submit' name='editar' value='Editar'>
                 </form>
                 <form method='post' onsubmit='return confirm(\"¿Estás seguro de que deseas borrar esta pizza?\")'>
-                    <input type='hidden' name='pizza_id' value='$row[id]'>
+                    <input type='hidden' name='pizza_id' value='{$row['id']}'>
                     <input type='submit' name='borrar' value='Borrar'>
                 </form>
               </td>";
@@ -94,6 +126,7 @@ function listarPizzas($conn)
 }
 
 ?>
+
 <!DOCTYPE html>
 <html>
 
@@ -151,6 +184,18 @@ function listarPizzas($conn)
         listarPizzas($conn);
         ?>
     </div>
+
+    </form>
+    <form action="Index.php" method="post">
+        <div class="tabla">
+            <?php
+            masVendidas($conn)
+            ?>
+        </div>
+        <a href="Index.php" <? session_destroy();?>> Cerrar Sesión</a>
+    </form>
+    
 </body>
 
 </html>
+
