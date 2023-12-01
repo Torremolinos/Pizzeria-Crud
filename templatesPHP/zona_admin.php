@@ -1,95 +1,31 @@
 <?php
 session_start();
+
 if (!isset($_SESSION["usuario"])) {
-    header("Location: Index.php?redirigido=true");
-    exit;
+    header("Location: index.php?redirigido=true");
 }
 
 function conectarBD()
 {
     $cadena_conexion = 'mysql:dbname=dwes_t3;host=127.0.0.1';
     $usuario = "root";
-    $contrasenia = "";
+    $clave = "";
 
     try {
-        $bd = new PDO($cadena_conexion, $usuario, $contrasenia);
+        $bd = new PDO($cadena_conexion, $usuario, $clave);
         return $bd;
     } catch (PDOException $e) {
-        echo "Error conectando a la bd: " . $e->getMessage();
+        echo "Error conectar BD: " . $e->getMessage();
         exit;
     }
 }
-
-
-
-// Conectar a la base de datos
 $conn = conectarBD();
-
-// Revisa si el formulario ha sido enviado
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Recoger los datos del formulario
-    $nombrePizza = $_POST['nombre'] ?? '';
-    $costePizza = $_POST['coste'] ?? '';
-    $precioPizza = $_POST['precio'] ?? '';
-    $ingredientesPizza = $_POST['ingredientes'] ?? '';
-
-    // Verificar que los datos no estén vacíos antes de insertar
-    if (!empty($nombrePizza) && !empty($costePizza) && !empty($precioPizza) && !empty($ingredientesPizza)) {
-        // Preparar la consulta SQL
-        $insertar = $conn->prepare("INSERT INTO pizzas (nombre, coste, precio, ingredientes) VALUES (:nombre, :coste, :precio, :ingredientes)");
-
-        // Vincular los parámetros
-        $insertar->bindParam(':nombre', $nombrePizza);
-        $insertar->bindParam(':coste', $costePizza);
-        $insertar->bindParam(':precio', $precioPizza);
-        $insertar->bindParam(':ingredientes', $ingredientesPizza);
-
-        $insertar->execute();
-    } elseif (isset($_POST['borrar'])) {
-        $pizza_id = $_POST['pizza_id'] ?? '';
-
-        // Preparar la consulta SQL para borrar la pizza
-        $borrar = $conn->prepare("DELETE FROM pizzas WHERE id = :pizza_id");
-        $borrar->bindParam(':pizza_id', $pizza_id);
-        $borrar->execute();
-    } elseif (isset($_POST['editar'])) {
-        $pizza_id = $_POST['pizza_id'] ?? '';
-        $nombrePizza = $_POST['nombre'] ?? '';
-        $costePizza = $_POST['coste'] ?? '';
-        $precioPizza = $_POST['precio'] ?? '';
-        $ingredientesPizza = $_POST['ingredientes'] ?? '';
-
-        if (isset($_POST['actualizar'])) {
-            $nombre = $_POST['nombre'] ?? '';
-            $coste = $_POST['coste'] ?? '';
-            $precio = $_POST['precio'] ?? '';
-            $ingredientes = $_POST['ingredientes'] ?? '';
-            $pizza_id = $_POST['id'] ?? '';
-
-            // Preparar la consulta SQL para editar la pizza
-            $editar = $conn->prepare("UPDATE pizzas SET nombre = :nombre, coste = :coste, precio = :precio, ingredientes = :ingredientes WHERE id = :pizza_id");
-            $editar->bindParam(':nombre', $nombre);
-            $editar->bindParam(':coste', $coste);
-            $editar->bindParam(':precio', $precio);
-            $editar->bindParam(':ingredientes', $ingredientes);
-            $editar->bindParam(':pizza_id', $pizza_id);
-            $editar->execute();
-        }
-    }
-}
-function editPizza($conn, $id){
-    // Preparar y ejecutar la consulta para obtener los detalles de la pizza por su ID
-  $query = $conn->prepare("SELECT * FROM pizzas WHERE id = :id");
-  $query->bindParam(":id", $id);
-  $query->execute();
-  // Devuelve los detalles de la pizza como un array asociativo
-  return $query->fetch(PDO::FETCH_ASSOC);
-}
 
 function masVendidas($conn)
 {
 
-    $masvendi = $conn->prepare("SELECT nombre, COUNT(*) as count FROM pedidos GROUP BY nombre ORDER BY count DESC LIMIT 1");    $masvendi->execute();
+    $masvendi = $conn->prepare("SELECT nombre, COUNT(*) as count FROM pedidos GROUP BY nombre ORDER BY count DESC LIMIT 1");
+    $masvendi->execute();
     echo "<table border='2'>";
     echo "<tr><th>Pizza Más Vendida</th></tr>";
     foreach ($masvendi->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -99,41 +35,163 @@ function masVendidas($conn)
     }
     echo "</table>";
 }
-
-// Función para listar pizzas
 function listarPizzas($conn)
 {
-    $consulta = $conn->prepare("SELECT id, nombre, ingredientes, coste, precio FROM pizzas");
+    $consulta = $conn->prepare("SELECT id, nombre, ingredientes, precio, coste FROM pizzas");
     $consulta->execute();
-    echo "<table border='2'>";
-    echo "<tr><th>Pizza</th><th>Ingredientes</th><th>Coste</th><th>Precio</th><th>Acciones Admin</th></tr>";
+
+    echo "<table border='1'>";
+    echo "<tr><th>Pizza</th><th>Ingredientes</th><th>Precio</th><th>Coste</th><th>Acciones Admin</th></tr>";
+
     foreach ($consulta->fetchAll(PDO::FETCH_ASSOC) as $row) {
         echo "<tr>";
-        echo "<td>{$row['nombre']}</td><td>{$row['ingredientes']}</td><td>{$row['coste']}</td><td>{$row['precio']}€</td>";
-        echo "<td>
-                <form action='' method='post'>
-                    <input type='hidden' name='pizza_id' value='{$row['id']}'>
-                    <input type='submit' name='editar' value='Editar'>
-                </form>
-                <form method='post' onsubmit='return confirm(\"¿Estás seguro de que deseas borrar esta pizza?\")'>
-                    <input type='hidden' name='pizza_id' value='{$row['id']}'>
-                    <input type='submit' name='borrar' value='Borrar'>
-                </form>
-              </td>";
+        echo "<td>$row[nombre]</td><td>$row[ingredientes]</td><td>$row[precio]€</td><td>$row[coste]€</td>";
+        echo "<td>";
+
+        echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='post' style='display: inline;'>";
+        echo "<input type='hidden' name='id' value='$row[id]'>";
+        echo "<button type='submit' name='editar'>Editar</button>";
+        echo "</form>";
+
+        echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='post' style='display: inline;'>";
+        echo "<input type='hidden' name='id' value='$row[id]'>";
+        echo "<button type='submit' name='borrar'>Borrar</button>";
+        echo "</form>";
+
+        echo "</td>";
         echo "</tr>";
     }
+
     echo "</table>";
 }
 
+function crearPizza($conn)
+{
+    $nombrePizza = $_POST["nombrePizza"];
+    $costePizza = floatval($_POST["costePizza"]);
+    $precioPizza = floatval($_POST["precioPizza"]);
+    $ingredientesPizza = $_POST["ingredientesPizza"];
+
+    $insertar = $conn->prepare("INSERT INTO pizzas (nombre, coste, precio, ingredientes) VALUES 
+    (:nombre, :coste, :precio, :ingredientes)");
+
+    $insertar->bindParam(':nombre', $nombrePizza);
+    $insertar->bindParam(':coste', $costePizza);
+    $insertar->bindParam(':precio', $precioPizza);
+    $insertar->bindParam(':ingredientes', $ingredientesPizza);
+
+    try {
+        $insertar->execute();
+    } catch (PDOException $e) {
+        echo "Error al insertar la pizza: " . $e->getMessage();
+    }
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+function borrarPizza($conn, $idPizza)
+{
+    $eliminar = $conn->prepare("DELETE FROM pizzas WHERE id = :id");
+
+    $eliminar->bindParam(":id", $idPizza);
+
+    $eliminar->execute();
+}
+
+//Funciones del boton editar
+function obtenerPizzaPorId($conn, $idPizza)
+{
+    $consulta = $conn->prepare("SELECT id, nombre, ingredientes, precio, coste FROM pizzas WHERE id = :id");
+    $consulta->bindParam(':id', $idPizza);
+    $consulta->execute();
+    return $consulta->fetch(PDO::FETCH_ASSOC);
+}
+
+function editarPizza($conn)
+{
+    if (isset($_POST["id"])) {
+        $idPizza = $_POST["id"];
+        $pizza = obtenerPizzaPorId($conn, $idPizza);
+
+        if ($pizza) {
+
+            echo "<h2>Editar Pizza</h2>";
+            echo "<div class='formulario'>";
+            echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='post'>";
+            echo "<input type='hidden' name='id' value='$pizza[id]'>";
+            echo "<label for='nombrePizza'>Nombre de la Pizza:</label>";
+            echo "<input value='" . htmlspecialchars($pizza['nombre']) . "' name='nombrePizza' placeholder='Nombre de la Pizza...' required><br>";
+
+            echo "<label for='costePizza'>Coste de la Pizza:</label>";
+            echo "<input value='" . htmlspecialchars($pizza['coste']) . "' name='costePizza' placeholder='Coste de la Pizza...' required><br>";
+
+            echo "<label for='precioPizza'>Precio de la Pizza:</label>";
+            echo "<input value='" . htmlspecialchars($pizza['precio']) . "' name='precioPizza' placeholder='Precio de la Pizza...' required><br>";
+
+            echo "<label for='ingredientesPizza'>Ingredientes de la Pizza:</label>";
+            echo "<input value='" . htmlspecialchars($pizza['ingredientes']) . "' name='ingredientesPizza' placeholder='Ingredientes de la Pizza...' required><br>";
+
+            echo "<button type='submit' name='guardarEdicion'>Guardar Edición</button>";
+            echo "</form>";
+            echo "</div>";
+        }
+    }
+}
+
+function guardarEdicionPizza($conn)
+{
+    $idPizza = $_POST["id"];
+    $nombrePizza = $_POST["nombrePizza"];
+    $costePizza = floatval($_POST["costePizza"]);
+    $precioPizza = floatval($_POST["precioPizza"]);
+    $ingredientesPizza = $_POST["ingredientesPizza"];
+
+    $editar = $conn->prepare("UPDATE pizzas SET nombre = :nombre, coste = :coste, precio = :precio, ingredientes = :ingredientes WHERE id = :id");
+
+    $editar->bindParam(':id', $idPizza);
+    $editar->bindParam(':nombre', $nombrePizza);
+    $editar->bindParam(':coste', $costePizza);
+    $editar->bindParam(':precio', $precioPizza);
+    $editar->bindParam(':ingredientes', $ingredientesPizza);
+
+    try {
+        $editar->execute();
+    } catch (PDOException $e) {
+        echo "Error al editar la pizza: " . $e->getMessage();
+    }
+
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST["crear"])) {
+        crearPizza($conn);
+    } elseif (isset($_POST["editar"])) {    //Para que se muestre el formulario
+        editarPizza($conn);
+    } elseif (isset($_POST["guardarEdicion"])) {    //Para que edite la pizza
+        guardarEdicionPizza($conn);
+    } elseif (isset($_POST["borrar"])) {
+        $idPizzaABorrar = $_POST["id"];
+        borrarPizza($conn, $idPizzaABorrar);
+    }
+} else {
+    $nombrePizza = $costePizza = $precioPizza = $ingredientesPizza = '';
+}
+
+$nombrePizza = $costePizza = $precioPizza = $ingredientesPizza = '';
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zona Admin</title>
+    <link rel="stylesheet" href="css/style-admin.css">
+    <title>Administrador<?php echo $_SESSION['nombre'] ?></title>
     <link rel="stylesheet" href="../styles/index.css">
     <style>
         .formulario {
@@ -152,7 +210,7 @@ function listarPizzas($conn)
         }
 
         .formulario input[type="submit"] {
-            background-color:burlywood;
+            background-color: burlywood;
             color: white;
             padding: 10px 20px;
             border: none;
@@ -163,39 +221,66 @@ function listarPizzas($conn)
         .formulario input[type="submit"]:hover {
             background-color: coral;
         }
+
+        input {
+            margin: 5px;
+            padding: 10px 20px;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: burlywood;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: bisque;
+        }
     </style>
 </head>
 
 <body>
-    <h1>Bienvenido, <?php echo $_SESSION['nombre'] ?></h1>
-    <a href="Index.php">Volver a la página principal</a>
-    <div class="formulario">
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            Nombre: <input type="text" name="nombre"><br>
-            Coste: <input type="number" step="0.01" name="coste"><br>
-            Precio: <input type="number" step="0.01" name="precio"><br>
-            Ingredientes: <textarea name="ingredientes"></textarea><br>
-            <input type="submit" name="submit" value="Añadir Pizza">
-        </form>
-    </div>
-    <h1>Listado de Pizzas</h1>
-    <div class="tabla">
-        <?php
-        listarPizzas($conn);
-        ?>
-    </div>
+    <div>
+        <h1>Bienvenido, Admin</h1>
+        <a href="Index.php">Volver a la página principal</a>
+        <h1>Listado de Pizzas</h1>
+        <div class="formulario">
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+                <label for="nombrePizza">Nombre de la Pizza:</label>
+                <input value="<?php echo htmlspecialchars($nombrePizza); ?>" name="nombrePizza" placeholder="Nombre de la Pizza..." required><br>
 
-    </form>
-    <form action="Index.php" method="post">
+                <label for="costePizza">Coste de la Pizza:</label>
+                <input value="<?php echo htmlspecialchars($costePizza); ?>" name="costePizza" placeholder="Coste de la Pizza..." required><br>
+
+                <label for="precioPizza">Precio de la Pizza:</label>
+                <input value="<?php echo htmlspecialchars($precioPizza); ?>" name="precioPizza" placeholder="Precio de la Pizza..." required><br>
+
+                <label for="ingredientesPizza">Ingredientes de la Pizza:</label>
+                <input value="<?php echo htmlspecialchars($ingredientesPizza); ?>" name="ingredientesPizza" placeholder="Ingredientes de la Pizza..." required><br>
+
+                <button type="submit" name="crear">Enviar</button>
+            </form>
+        </div>
         <div class="tabla">
             <?php
-            masVendidas($conn)
+            listarPizzas($conn);
             ?>
         </div>
-        <a href="Index.php" <? session_destroy();?>> Cerrar Sesión</a>
-    </form>
-    
+
+        <form action="Index.php" method="post">
+            <div class="tabla">
+                <?php
+                masVendidas($conn)
+                ?>
+            </div>
+        </form>
+
+        <a href='index.php?logout=true'>Cerrar Sesión</a>
+    </div>
 </body>
 
 </html>
-
