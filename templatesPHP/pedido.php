@@ -98,6 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+    <h1>PIZZERIA TRATORIA NAPOLÉS</h1>
     <h1>Pedido de <?php echo $_SESSION['nombre'] ?></h1>
     <h2>Seleccione las pizzas que desea añadir al pedido:</h2>
     <?php listarPizzas($conn); ?>

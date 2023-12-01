@@ -245,6 +245,7 @@ $nombrePizza = $costePizza = $precioPizza = $ingredientesPizza = '';
 
 <body>
     <div>
+        <h1>PIZZERIA TRATORIA NAPOLÉS</h1>
         <h1>Bienvenido, Admin</h1>
         <a href="Index.php">Volver a la página principal</a>
         <h1>Listado de Pizzas</h1>

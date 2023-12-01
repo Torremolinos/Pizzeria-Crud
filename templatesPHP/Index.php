@@ -8,7 +8,7 @@ function conectarBD()
     $contrasenia = "";
     try {
         //Se crea el objeto de conexion a la base de datos y se devueve
-        $bd = new PDO($cadena_conexion, $usuario, $contrasenia); 
+        $bd = new PDO($cadena_conexion, $usuario, $contrasenia);
         return $bd;
     } catch (PDOException $e) {
         echo "Error conectar BD: " . $e->getMessage();
@@ -72,9 +72,9 @@ function listarPizzas($conn)
     <link rel="stylesheet" href="../styles/index.css">
     <title>Index</title>
     <style>
-         button{
+        button {
             padding: 10px 20px;
-            background-color:burlywood;
+            background-color: burlywood;
             color: white;
             border: none;
             border-radius: 3px;
@@ -84,13 +84,15 @@ function listarPizzas($conn)
         button:hover {
             background-color: bisque;
         }
-        label{
+
+        label {
             margin: 5px;
         }
     </style>
 </head>
 
 <body>
+    <h1>PIZZERIA TRATORIA NAPOLÉS</h1>
     <?php if (!isset($_SESSION['usuario'])) : ?>
         <section class="<?php echo !isset($_SESSION['usuario']) ? '' : 'esconde'; ?>">
             <h2>Identificate</h2>
@@ -103,7 +105,7 @@ function listarPizzas($conn)
                     <input type="password" name="contrasenia"> <!-- Este tipo nos permite que salgan puntitos para que no se vea -->
                     <button action="submit">Iniciar Sesión</button>
                 </form>
-               
+
             </div>
         </section>
     <?php endif; ?>

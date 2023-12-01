@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>Registro</title>
     <link rel="stylesheet" href="../styles/index.css">
     <style>
-        button{
+        button {
             padding: 10px 20px;
             background-color: burlywood;
             color: white;
@@ -75,6 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 3px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: bisque;
         }
@@ -82,6 +83,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+    <h1>PIZZERIA TRATORIA NAPOLÉS</h1>
     <h1>REGISTRO</h1>
     <h2>Hola, completa todos los campos para poder registrarte</h2>
     <div class="formulario">
