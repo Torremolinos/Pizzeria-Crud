@@ -29,6 +29,7 @@ function conectarBD()
     <link rel="stylesheet" href="../styles/pedido.css">
 </head>
 <body>
+    <h1>PIZZERIA TRATORIA NAPOLÉS</h1>
     <h1>Realizar Pedido</h1>
     <form action="procesar_pedido.php" method="post">
     <?php for ($i = 1; $i <= 4; $i++): ?>
