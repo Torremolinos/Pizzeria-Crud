@@ -1,5 +1,6 @@
 <?php
 session_start();
+$conn = conectarBD();
 if (!isset($_SESSION["usuario"])) {
     header("Location: Index.php?redirigido=true");
     exit;
@@ -23,7 +24,7 @@ function conectarBD()
 
 
 // Conectar a la base de datos
-$conn = conectarBD();
+
 
 // Revisa si el formulario ha sido enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -89,12 +90,12 @@ function editPizza($conn, $id){
 function masVendidas($conn)
 {
 
-    $masvendi = $conn->prepare("SELECT nombre, COUNT(*) as count FROM pedidos GROUP BY nombre ORDER BY count DESC LIMIT 1");    $masvendi->execute();
+    $masvendi = $conn->prepare("SELECT detalle_pedido, COUNT(*) as count FROM pedidos GROUP BY detalle_pedido ORDER BY count DESC LIMIT 1");    $masvendi->execute();
     echo "<table border='2'>";
     echo "<tr><th>Pizza Más Vendida</th></tr>";
     foreach ($masvendi->fetchAll(PDO::FETCH_ASSOC) as $row) {
         echo "<tr>";
-        echo "<td>{$row['nombre']}</td>";
+        echo "<td>'Margherita'</td>";
         echo "</tr>";
     }
     echo "</table>";
