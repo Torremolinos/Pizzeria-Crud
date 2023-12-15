@@ -80,6 +80,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <p>Detalle del Pedido: <?php echo $detalle_pedido; ?></p>
     <p>Total: $<?php echo number_format($total, 2); ?></p>
     <?php endif; ?>
-        
+    <a href="Index.php">Volver al inicio</a>
 </body>
 </html>

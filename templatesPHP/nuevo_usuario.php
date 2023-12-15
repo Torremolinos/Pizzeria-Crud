@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($nombre) && !empty($correo) && !empty($contrasenia) && !empty($rol) && !empty($usuario)) {
         // Verificar si el usuario ya existe
         if (usuarioExiste($usuario)) {
-            echo "El nombre de usuario ya existe. Por favor, elige otro.";
+            echo "El nombre de usuario ya existe. Por favor, elige otro."; //AQUI SE SABE SI ESTA REGISTRADO O NO Y SE MUESTRA.
         } else {
             // Preparar la consulta SQL
             $conexion = conectarBD(); // Usamos la función para conectar a la base de datos
