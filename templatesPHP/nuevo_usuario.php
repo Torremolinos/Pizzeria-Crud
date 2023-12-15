@@ -96,7 +96,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="text" name="nombre">
             <br />
             <label for="rol">Rol</label>
-            <input type="text" name="rol">
+            <input type="text" name="rol" value="1" readonly>
             <br />
             <label for="correo">Correo</label>
             <input type="email" name="correo">
