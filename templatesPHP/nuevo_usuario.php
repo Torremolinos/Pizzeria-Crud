@@ -78,6 +78,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         button:hover {
             background-color: bisque;
         }
+        .escondido{
+            display: none;
+        }
     </style>
 </head>
 
@@ -95,8 +98,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label for="nombre">Nombre</label>
             <input type="text" name="nombre">
             <br />
-            <label for="rol">Rol</label>
-            <input type="text" name="rol" value="1" readonly>
+            <input class="escondido" type="text" name="rol" value="2" readonly>
             <br />
             <label for="correo">Correo</label>
             <input type="email" name="correo">
